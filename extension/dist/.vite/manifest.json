@@ -1,0 +1,45 @@
+{
+  "../../../../../../@crx/manifest": {
+    "file": "assets/crx-manifest.js-Bu42g3RM.js",
+    "name": "crx-manifest.js",
+    "src": "../../../../../../@crx/manifest",
+    "isEntry": true
+  },
+  "_modulepreload-polyfill-B5Qt9EMX.js": {
+    "file": "assets/modulepreload-polyfill-B5Qt9EMX.js",
+    "name": "modulepreload-polyfill"
+  },
+  "popup.html": {
+    "file": "assets/popup-C38Wj-wp.js",
+    "name": "popup",
+    "src": "popup.html",
+    "isEntry": true,
+    "imports": [
+      "_modulepreload-polyfill-B5Qt9EMX.js"
+    ],
+    "css": [
+      "assets/popup-CZmwYFYl.css"
+    ]
+  },
+  "sidepanel.html": {
+    "file": "assets/sidepanel.html-npXqlZj9.js",
+    "name": "sidepanel.html",
+    "src": "sidepanel.html",
+    "isEntry": true,
+    "imports": [
+      "_modulepreload-polyfill-B5Qt9EMX.js"
+    ]
+  },
+  "src/background.ts": {
+    "file": "assets/background.ts-CZxwo607.js",
+    "name": "background.ts",
+    "src": "src/background.ts",
+    "isEntry": true
+  },
+  "src/content-interactive.ts": {
+    "file": "assets/content-interactive.ts-rtrK1uAQ.js",
+    "name": "content-interactive.ts",
+    "src": "src/content-interactive.ts",
+    "isEntry": true
+  }
+}

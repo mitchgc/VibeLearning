@@ -1,0 +1,279 @@
+{
+  "id": "expense_submission",
+  "name": "Submit Expense Report",
+  "platform": "workday",
+  "version": "1.0.0",
+  "difficulty": "medium",
+  "estimatedTime": 300,
+  "description": "Complete workflow for submitting an expense report in Workday",
+  "prerequisites": [
+    "Have receipts ready to upload",
+    "Know your cost center or project code"
+  ],
+  "adaptive": true,
+  "steps": [
+    {
+      "id": "navigate_to_expenses",
+      "title": "Navigate to Expenses",
+      "intent": "open_expense_module",
+      "instruction": "Click on the Expenses worklet/tile on your Workday homepage",
+      "selectors": [
+        "[data-automation-id='globalNavButton_expenses']",
+        "[aria-label*='Expenses']",
+        "button[title*='Expenses']",
+        "div[data-automation-id='pex:expenses']"
+      ],
+      "position": "bottom",
+      "waitForElement": "[data-automation-id='expense_report_list']",
+      "validation": {
+        "type": "url_matches",
+        "pattern": ".*\\/expenses.*"
+      },
+      "skippable": false
+    },
+    {
+      "id": "create_expense_report",
+      "title": "Create New Report",
+      "intent": "create_new_expense",
+      "instruction": "Click on 'Create Expense Report' or the '+' button",
+      "selectors": [
+        "[data-automation-id='createExpenseReport']",
+        "button[aria-label='Create Expense Report']",
+        "button:contains('Create')",
+        "[data-automation-id='ADD_EXPENSE_REPORT']"
+      ],
+      "position": "right",
+      "autoAdvance": true,
+      "autoAdvanceOn": "click"
+    },
+    {
+      "id": "select_expense_type",
+      "title": "Select Expense Type",
+      "intent": "select_expense_type",
+      "instruction": "Choose the type of expense report (typically 'Employee Expense Report')",
+      "selectors": [
+        "[data-automation-id='expense_report_type']",
+        "select[aria-label='Expense Report Type']",
+        "input[placeholder*='expense type']"
+      ],
+      "position": "bottom",
+      "extraContext": "Most employees will select 'Employee Expense Report'. If you're submitting for a specific project, you might see 'Project Expense Report' as an option."
+    },
+    {
+      "id": "enter_report_details",
+      "title": "Enter Report Details",
+      "intent": "enter_report_name",
+      "instruction": "Enter a descriptive name for your expense report",
+      "selectors": [
+        "[data-automation-id='expense_report_name']",
+        "input[placeholder*='Report Name']",
+        "input[aria-label='Expense Report Name']"
+      ],
+      "position": "bottom",
+      "validation": {
+        "type": "element_contains_text",
+        "selector": "input[data-automation-id='expense_report_name']",
+        "text": ""
+      }
+    },
+    {
+      "id": "select_date_range",
+      "title": "Select Date Range",
+      "intent": "select_date_range",
+      "instruction": "Choose the date range for your expenses",
+      "selectors": [
+        "[data-automation-id='dateRangeFrom']",
+        "input[aria-label='From Date']",
+        "input[placeholder*='From']"
+      ],
+      "position": "bottom",
+      "extraContext": "Select the earliest date of your expenses as the 'From' date and the latest as the 'To' date"
+    },
+    {
+      "id": "add_expense_line",
+      "title": "Add Expense Line Item",
+      "intent": "add_expense_item",
+      "instruction": "Click 'Add Expense Line' or '+' to add your first expense",
+      "selectors": [
+        "[data-automation-id='addExpenseLine']",
+        "button[aria-label='Add Expense Line']",
+        "button:contains('Add Expense')",
+        "[data-automation-id='ADD_LINE']"
+      ],
+      "position": "top"
+    },
+    {
+      "id": "select_expense_category",
+      "title": "Select Expense Category",
+      "intent": "select_category",
+      "instruction": "Choose the appropriate expense category (e.g., Meals, Travel, Lodging)",
+      "selectors": [
+        "[data-automation-id='expenseCategory']",
+        "select[aria-label='Expense Category']",
+        "input[placeholder*='Category']"
+      ],
+      "position": "bottom",
+      "extraContext": "Common categories: Meals (breakfast/lunch/dinner), Transportation (taxi/uber), Lodging (hotel), Office Supplies"
+    },
+    {
+      "id": "enter_amount",
+      "title": "Enter Amount",
+      "intent": "enter_expense_amount",
+      "instruction": "Enter the expense amount",
+      "selectors": [
+        "[data-automation-id='expenseAmount']",
+        "input[aria-label='Amount']",
+        "input[placeholder*='Amount']",
+        "input[type='number']"
+      ],
+      "position": "bottom"
+    },
+    {
+      "id": "select_payment_type",
+      "title": "Select Payment Type",
+      "intent": "select_payment_type",
+      "instruction": "Choose how you paid (Corporate Card, Personal Card, Cash)",
+      "selectors": [
+        "[data-automation-id='paymentType']",
+        "select[aria-label='Payment Type']",
+        "input[placeholder*='Payment']"
+      ],
+      "position": "bottom"
+    },
+    {
+      "id": "enter_business_purpose",
+      "title": "Enter Business Purpose",
+      "intent": "enter_business_purpose",
+      "instruction": "Provide a business justification for this expense",
+      "selectors": [
+        "[data-automation-id='businessPurpose']",
+        "textarea[aria-label='Business Purpose']",
+        "input[placeholder*='Purpose']",
+        "textarea[placeholder*='Justification']"
+      ],
+      "position": "bottom",
+      "extraContext": "Be specific about the business purpose. Example: 'Client dinner with ABC Corp to discuss Q4 contract renewal'"
+    },
+    {
+      "id": "attach_receipt",
+      "title": "Attach Receipt",
+      "intent": "attach_receipt",
+      "instruction": "Click the attachment/paperclip icon to upload your receipt",
+      "selectors": [
+        "[data-automation-id='attachReceipt']",
+        "button[aria-label='Attach']",
+        "[data-automation-id='ATTACH_BUTTON']",
+        "input[type='file']"
+      ],
+      "position": "right",
+      "extraContext": "Receipts are required for expenses over $25. Acceptable formats: PDF, JPG, PNG"
+    },
+    {
+      "id": "select_cost_center",
+      "title": "Select Cost Center",
+      "intent": "select_cost_center",
+      "instruction": "Choose the appropriate cost center or project code",
+      "selectors": [
+        "[data-automation-id='costCenter']",
+        "input[aria-label='Cost Center']",
+        "input[placeholder*='Cost Center']",
+        "[data-automation-id='PROJECT_CODE']"
+      ],
+      "position": "bottom",
+      "extraContext": "If unsure, use your default department cost center. Project-specific expenses should use the project code."
+    },
+    {
+      "id": "save_expense_line",
+      "title": "Save Expense Line",
+      "intent": "save_line_item",
+      "instruction": "Click 'OK' or 'Save' to add this expense line",
+      "selectors": [
+        "[data-automation-id='saveExpenseLine']",
+        "button:contains('OK')",
+        "button:contains('Save')",
+        "[data-automation-id='OK_BUTTON']"
+      ],
+      "position": "top"
+    },
+    {
+      "id": "add_more_expenses",
+      "title": "Add More Expenses?",
+      "intent": "check_more_expenses",
+      "instruction": "Add additional expense lines if needed, or continue to submit",
+      "selectors": [
+        "[data-automation-id='addExpenseLine']",
+        "button:contains('Add Another')"
+      ],
+      "position": "bottom",
+      "skippable": true,
+      "skipCondition": {
+        "type": "user_choice",
+        "prompt": "Do you have more expenses to add?"
+      }
+    },
+    {
+      "id": "review_totals",
+      "title": "Review Totals",
+      "intent": "review_expense_totals",
+      "instruction": "Review your expense totals and ensure everything is correct",
+      "selectors": [
+        "[data-automation-id='expenseTotals']",
+        "div[aria-label='Total Amount']",
+        ".expense-summary"
+      ],
+      "position": "bottom",
+      "waitForConfirmation": true
+    },
+    {
+      "id": "submit_report",
+      "title": "Submit Report",
+      "intent": "submit_expense_report",
+      "instruction": "Click 'Submit' to send your expense report for approval",
+      "selectors": [
+        "[data-automation-id='submitExpenseReport']",
+        "button:contains('Submit')",
+        "[data-automation-id='SUBMIT_BUTTON']",
+        "button[aria-label='Submit for Approval']"
+      ],
+      "position": "top",
+      "validation": {
+        "type": "custom",
+        "function": "return document.querySelector('.validation-error') === null;"
+      }
+    },
+    {
+      "id": "confirmation",
+      "title": "Confirmation",
+      "intent": "view_confirmation",
+      "instruction": "Note your expense report number for future reference",
+      "selectors": [
+        "[data-automation-id='confirmationMessage']",
+        ".confirmation-number",
+        "[data-automation-id='EXPENSE_REPORT_ID']"
+      ],
+      "position": "bottom",
+      "autoAdvance": false,
+      "extraContext": "Save this expense report number. You'll need it to track the approval status."
+    }
+  ],
+  "errorHandling": {
+    "missingReceipt": {
+      "message": "Receipt required for expenses over $25",
+      "solution": "Attach a receipt image or PDF before proceeding"
+    },
+    "invalidCostCenter": {
+      "message": "Invalid or unauthorized cost center",
+      "solution": "Contact your manager or finance team for the correct cost center"
+    },
+    "duplicateExpense": {
+      "message": "Potential duplicate expense detected",
+      "solution": "Review your previously submitted expenses to avoid duplicates"
+    }
+  },
+  "tips": [
+    "Take photos of receipts immediately to avoid losing them",
+    "Group similar expenses (e.g., all meals from one trip) in the same report",
+    "Submit expense reports within 30 days of the expense date",
+    "Keep physical receipts for 90 days after submission"
+  ]
+}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VibeLearning</title>
+  <script type="module" crossorigin src="/assets/popup-C38Wj-wp.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="stylesheet" crossorigin href="/assets/popup-CZmwYFYl.css">
+</head>
+<body>
+  <div class="popup-container">
+    <div class="header">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAASklEQVR4nO3OoQHAIADAMOC+CT7lxfmZSiaSCzKfs8efrNuBL6EiVISKUBEqQkWoCBWhIlSEilARKkJFqAgVoSJUhIpQESpCRai8Wv4Bq+VJId4AAAAASUVORK5CYII=" alt="VibeLearning" class="logo">
+      <h1>VibeLearning</h1>
+      <div class="toggle-switch">
+        <input type="checkbox" id="enabled-toggle" checked>
+        <label for="enabled-toggle"></label>
+      </div>
+    </div>
+
+    <div class="status-section">
+      <div class="status-indicator" id="status-indicator">
+        <span class="status-dot"></span>
+        <span class="status-text">Ready</span>
+      </div>
+    </div>
+
+    <div class="content">
+      <div id="no-app-detected" class="message-box hidden">
+        <p>No supported application detected on this page.</p>
+        <p class="hint">Navigate to Workday, Salesforce, or another supported app to see available workflows.</p>
+      </div>
+
+      <div id="app-detected" class="hidden">
+        <div class="app-info">
+          <span class="app-name" id="app-name"></span>
+          <span class="app-badge">Detected</span>
+        </div>
+
+        <div class="workflows-section">
+          <h3>Available Workflows</h3>
+          <div id="workflow-list" class="workflow-list">
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <button id="search-workflow" class="action-button secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            Search Workflows
+          </button>
+          <button id="record-workflow" class="action-button secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            Record New
+          </button>
+        </div>
+      </div>
+
+      <div id="workflow-active" class="hidden">
+        <div class="workflow-progress">
+          <h3 id="active-workflow-name"></h3>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <p class="progress-text">
+            Step <span id="current-step">1</span> of <span id="total-steps">10</span>
+          </p>
+        </div>
+
+        <div class="workflow-controls">
+          <button id="pause-workflow" class="control-button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16"></rect>
+              <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+            Pause
+          </button>
+          <button id="stop-workflow" class="control-button danger">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="4" y="4" width="16" height="16"></rect>
+            </svg>
+            Stop
+          </button>
+        </div>
+      </div>
+
+      <div id="search-panel" class="search-panel hidden">
+        <input type="text" id="search-input" placeholder="Search for workflows..." class="search-input">
+        <div id="search-results" class="search-results"></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-value" id="workflows-completed">0</span>
+          <span class="stat-label">Completed</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="time-saved">0m</span>
+          <span class="stat-label">Time Saved</span>
+        </div>
+      </div>
+
+      <div class="footer-links">
+        <a href="#" id="settings-link">Settings</a>
+        <a href="#" id="help-link">Help</a>
+        <a href="#" id="feedback-link">Feedback</a>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

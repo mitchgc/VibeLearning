@@ -1,0 +1,132 @@
+{
+  "id": "create_playlist",
+  "name": "Create a YouTube Playlist",
+  "platform": "youtube",
+  "version": "1.0.0",
+  "difficulty": "easy",
+  "estimatedTime": 120,
+  "description": "Learn how to create and organize a new playlist on YouTube",
+  "prerequisites": [
+    "Be signed into your YouTube account"
+  ],
+  "steps": [
+    {
+      "id": "navigate_to_library",
+      "title": "Go to Your Library",
+      "intent": "open_library",
+      "instruction": "Click on 'Library' in the left sidebar",
+      "selectors": [
+        "a[href='/feed/library']",
+        "[aria-label='Library']",
+        "yt-formatted-string:contains('Library')",
+        "#guide-section-2 a[href*='library']"
+      ],
+      "position": "right",
+      "validation": {
+        "type": "url_matches",
+        "pattern": ".*\\/feed\\/library.*"
+      }
+    },
+    {
+      "id": "find_playlists_section",
+      "title": "Find Playlists Section",
+      "intent": "locate_playlists",
+      "instruction": "Scroll down to find the 'Playlists' section",
+      "selectors": [
+        "h2:contains('Playlists')",
+        "[aria-label*='Playlists']",
+        "ytd-shelf-renderer h2"
+      ],
+      "position": "bottom",
+      "extraContext": "If you don't see a Playlists section, you might need to create your first playlist"
+    },
+    {
+      "id": "click_new_playlist",
+      "title": "Create New Playlist",
+      "intent": "create_new_playlist",
+      "instruction": "Click 'New playlist' or the '+' button",
+      "selectors": [
+        "button:contains('New playlist')",
+        "[aria-label*='Create playlist']",
+        "ytd-button-renderer[has-text='New playlist']",
+        ".ytd-playlist-add-to-option-renderer button"
+      ],
+      "position": "top"
+    },
+    {
+      "id": "enter_playlist_name",
+      "title": "Name Your Playlist",
+      "intent": "enter_playlist_title",
+      "instruction": "Enter a name for your playlist",
+      "selectors": [
+        "input[placeholder*='playlist name']",
+        "#playlist-name input",
+        "input[aria-label*='playlist']",
+        "#create-playlist-form input"
+      ],
+      "position": "bottom",
+      "validation": {
+        "type": "element_contains_text",
+        "selector": "input",
+        "text": ""
+      }
+    },
+    {
+      "id": "set_privacy_setting",
+      "title": "Choose Privacy Setting",
+      "intent": "select_privacy",
+      "instruction": "Choose whether your playlist is Public, Unlisted, or Private",
+      "selectors": [
+        "tp-yt-paper-radio-group",
+        "[name='privacy']",
+        ".privacy-setting-option",
+        "tp-yt-paper-radio-button"
+      ],
+      "position": "right",
+      "extraContext": "Public = Anyone can search and view, Unlisted = Only people with link can view, Private = Only you can view"
+    },
+    {
+      "id": "create_playlist_button",
+      "title": "Create the Playlist",
+      "intent": "confirm_create_playlist",
+      "instruction": "Click 'Create' to make your playlist",
+      "selectors": [
+        "button:contains('Create')",
+        "[aria-label='Create playlist']",
+        "#create-playlist-button",
+        ".create-button"
+      ],
+      "position": "top"
+    },
+    {
+      "id": "confirmation",
+      "title": "Playlist Created!",
+      "intent": "view_confirmation",
+      "instruction": "Your playlist has been created. You can now start adding videos to it.",
+      "selectors": [
+        ".playlist-created-message",
+        "h1[aria-label*='playlist']",
+        ".playlist-header"
+      ],
+      "position": "bottom",
+      "autoAdvance": false,
+      "extraContext": "To add videos, search for videos and click the 'Save' button, then select this playlist."
+    }
+  ],
+  "errorHandling": {
+    "notSignedIn": {
+      "message": "You need to be signed in to create playlists",
+      "solution": "Click 'Sign In' in the top right corner and log into your Google account"
+    },
+    "playlistLimitReached": {
+      "message": "You've reached the maximum number of playlists",
+      "solution": "Delete some old playlists or upgrade to YouTube Premium"
+    }
+  },
+  "tips": [
+    "Use descriptive names for your playlists to make them easy to find",
+    "You can reorder videos in playlists by dragging them",
+    "Playlists can be shared with others using the share button",
+    "You can collaborate on playlists with other users"
+  ]
+}

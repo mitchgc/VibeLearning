@@ -1,0 +1,28 @@
+{
+  "name": "vibelearning-backend",
+  "version": "1.0.0",
+  "description": "VibeLearning Backend API",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "build": "echo 'Backend: No build step needed for Node.js'",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.6",
+    "better-sqlite3": "^12.2.0",
+    "dotenv": "^17.2.1",
+    "openai": "^5.15.0",
+    "compression": "^1.7.4",
+    "helmet": "^8.1.0",
+    "express-rate-limit": "^8.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "jest": "^30.0.5"
+  }
+}

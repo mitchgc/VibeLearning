@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VibeLearning Guidance</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8f9fa;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-header {
+      background: white;
+      padding: 20px;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .workflow-title {
+      font-weight: 600;
+      color: #1a1a1a;
+      font-size: 18px;
+      margin: 0;
+    }
+
+    .workflow-logo {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+    }
+
+    .sidebar-content {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .workflow-progress {
+      margin-bottom: 24px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 4px;
+      background: #e5e7eb;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: #4CAF50;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    .step-info {
+      text-align: right;
+    }
+
+    .step-number {
+      font-size: 11px;
+      color: #6b7280;
+      text-transform: uppercase;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .current-step {
+      margin-bottom: 24px;
+    }
+
+    .step-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0 0 12px 0;
+      line-height: 1.3;
+    }
+
+    .step-description {
+      font-size: 14px;
+      color: #4b5563;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .warning-message {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .step-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .btn-main {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-main:hover {
+      background: #45a049;
+    }
+
+    .btn-skip {
+      background: transparent;
+      color: #6b7280;
+      border: none;
+      padding: 8px 16px;
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .btn-skip:hover {
+      color: #374151;
+    }
+
+    .no-workflow {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+
+    .no-workflow h3 {
+      margin-bottom: 8px;
+      color: #1a1a1a;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+
+    .workflow-selection {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid #4CAF50;
+    }
+
+    .app-name {
+      font-weight: 600;
+      color: #1a1a1a;
+      font-size: 16px;
+    }
+
+    .app-badge {
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .workflows-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .workflow-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .workflow-item {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid #e0e0e0;
+    }
+
+    .workflow-item:hover {
+      border-color: #4CAF50;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .workflow-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .workflow-name {
+      font-weight: 500;
+      color: #1a1a1a;
+      font-size: 14px;
+    }
+
+    .workflow-difficulty {
+      padding: 4px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .workflow-difficulty.easy {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .workflow-difficulty.medium {
+      background: #fff3e0;
+      color: #ef6c00;
+    }
+
+    .workflow-difficulty.hard {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .workflow-time {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .loading-workflows {
+      text-align: center;
+      color: #666;
+      padding: 20px;
+      font-style: italic;
+    }
+  </style>
+  <script type="module" crossorigin src="/assets/sidepanel.html-npXqlZj9.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+</head>
+<body>
+  <div class="sidebar-header">
+    <h2 class="workflow-title">
+      <span>🎯</span>
+      <span id="workflow-name">VibeLearning</span>
+    </h2>
+  </div>
+  
+  <div class="sidebar-content">
+    <div id="loading-state" class="loading">
+      <p>Loading...</p>
+    </div>
+
+    <div id="workflow-selection-state" class="workflow-selection" style="display: none;">
+      <div class="app-info" id="app-info">
+        <div class="app-name" id="app-name">Detecting application...</div>
+        <div class="app-badge" id="app-badge">Loading</div>
+      </div>
+      
+      <div class="workflows-section">
+        <h3>Available Workflows</h3>
+        <div id="workflow-list" class="workflow-list">
+          <p class="loading-workflows">Loading workflows...</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="no-workflow-state" class="no-workflow" style="display: none;">
+      <h3>No Workflows Available</h3>
+      <p>Navigate to YouTube, GitHub, or Gmail to see available workflows for training.</p>
+    </div>
+
+    <div id="workflow-state" style="display: none;">
+      <div class="workflow-progress">
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="step-info">
+          <span class="step-number" id="step-counter">Step 1 of 6</span>
+        </div>
+      </div>
+      
+      <div class="current-step">
+        <h3 class="step-title" id="step-title">Step Title</h3>
+        <div class="step-description" id="step-instruction">
+          Step instructions will appear here.
+        </div>
+      </div>
+      
+      <div id="element-warning" class="warning-message" style="display: none;">
+        ⚠️ Can't find element automatically
+      </div>
+      
+      <div class="step-actions">
+        <button class="btn-main" id="next-step-btn">
+          Next Step
+        </button>
+        <button class="btn-skip" id="skip-tour-btn">
+          Skip Tutorial
+        </button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

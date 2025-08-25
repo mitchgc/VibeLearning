@@ -66,14 +66,24 @@ class SidePanelController {
 
   setupEventListeners() {
     const nextStepBtn = document.getElementById('next-step-btn');
-    const skipTourBtn = document.getElementById('skip-tour-btn');
+    const backStepBtn = document.getElementById('back-step-btn');
+    const exitTourBtn = document.getElementById('exit-tour-btn');
+    const smartDetectBtn = document.getElementById('smart-detect-btn');
 
     if (nextStepBtn) {
       nextStepBtn.addEventListener('click', () => this.nextStep());
     }
 
-    if (skipTourBtn) {
-      skipTourBtn.addEventListener('click', () => this.skipTour());
+    if (backStepBtn) {
+      backStepBtn.addEventListener('click', () => this.previousStep());
+    }
+
+    if (exitTourBtn) {
+      exitTourBtn.addEventListener('click', () => this.exitTour());
+    }
+
+    if (smartDetectBtn) {
+      smartDetectBtn.addEventListener('click', () => this.smartDetection());
     }
   }
 
@@ -315,22 +325,26 @@ class SidePanelController {
     const stepCounter = document.getElementById('step-counter');
     const stepInstruction = document.getElementById('step-instruction');
     const nextStepBtn = document.getElementById('next-step-btn') as HTMLButtonElement;
-    const progressBar = document.getElementById('progress-bar');
+    const backStepBtn = document.getElementById('back-step-btn') as HTMLButtonElement;
     
     if (stepTitle) stepTitle.textContent = step.title;
-    if (stepCounter) stepCounter.textContent = `Step ${this.currentStep + 1} of ${this.currentWorkflow.steps.length}`;
+    if (stepCounter) stepCounter.textContent = `Step ${this.currentStep + 1}/${this.currentWorkflow.steps.length}`;
     if (stepInstruction) {
       stepInstruction.textContent = step.instruction;
-    }
-    
-    if (progressBar) {
-      const progress = ((this.currentStep + 1) / this.currentWorkflow.steps.length) * 100;
-      progressBar.style.width = `${progress}%`;
     }
     
     if (nextStepBtn) {
       const isLastStep = this.currentStep === this.currentWorkflow.steps.length - 1;
       nextStepBtn.textContent = isLastStep ? 'Finish' : 'Next Step';
+    }
+
+    // Show/hide back button
+    if (backStepBtn) {
+      if (this.currentStep > 0) {
+        backStepBtn.style.display = 'block';
+      } else {
+        backStepBtn.style.display = 'none';
+      }
     }
 
     // Try to highlight element on the page
@@ -376,8 +390,35 @@ class SidePanelController {
     this.updateCurrentStep();
   }
 
-  skipTour() {
+  previousStep() {
+    if (!this.currentWorkflow || this.currentStep <= 0) return;
+    
+    this.currentStep--;
+    this.updateCurrentStep();
+  }
+
+  exitTour() {
     this.closeWorkflow();
+  }
+
+  async smartDetection() {
+    if (!this.currentWorkflow || !this.currentTab) return;
+    
+    const step = this.currentWorkflow.steps[this.currentStep];
+    
+    try {
+      // Try smart detection by sending message to content script
+      await chrome.tabs.sendMessage(this.currentTab.id, {
+        type: 'SMART_DETECT',
+        selector: step.selector,
+        step: step
+      });
+      
+      console.log('Smart detection attempted for:', step.selector);
+      
+    } catch (error) {
+      console.log('Smart detection failed:', error);
+    }
   }
 
   closeWorkflow() {
@@ -409,17 +450,11 @@ class SidePanelController {
   completeWorkflow() {
     if (!this.currentWorkflow) return;
     
-    // Update progress to 100%
-    const progressBar = document.getElementById('progress-bar');
-    if (progressBar) {
-      progressBar.style.width = '100%';
-    }
-    
     // Update title and counter
     const stepTitle = document.getElementById('step-title');
     const stepCounter = document.getElementById('step-counter');
     
-    if (stepTitle) stepTitle.textContent = '🎉 Complete!';
+    if (stepTitle) stepTitle.textContent = 'Complete!';
     if (stepCounter) stepCounter.textContent = 'Workflow finished';
     
     // Show completion message
@@ -428,10 +463,7 @@ class SidePanelController {
     const skipTourBtn = document.getElementById('skip-tour-btn') as HTMLButtonElement;
     
     if (stepInstruction) {
-      stepInstruction.innerHTML = `
-        <p style="margin: 0 0 16px 0; color: #059669;">You've successfully completed the "${this.currentWorkflow.name}" workflow!</p>
-        <p style="margin: 0; font-size: 13px; color: #6b7280;">Try exploring other workflows or practice this one again to master it.</p>
-      `;
+      stepInstruction.textContent = `You've successfully completed the "${this.currentWorkflow.name}" workflow! Try exploring other workflows or practice this one again to master it.`;
     }
     
     if (nextStepBtn) {
@@ -439,14 +471,16 @@ class SidePanelController {
       nextStepBtn.onclick = () => this.closeWorkflow();
     }
     
-    if (skipTourBtn) {
-      skipTourBtn.style.display = 'none';
+    // Hide back button on completion
+    const backStepBtn = document.getElementById('back-step-btn') as HTMLButtonElement;
+    if (backStepBtn) {
+      backStepBtn.style.display = 'none';
     }
     
-    // Auto-close after 8 seconds
+    // Auto-close after 5 seconds
     setTimeout(() => {
       this.closeWorkflow();
-    }, 8000);
+    }, 5000);
   }
 }
 

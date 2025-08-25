@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Ollama Test Extension",
+  "version": "1.0.0",
+  "description": "Test GET and POST requests to Ollama",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "declarativeNetRequest"
+  ],
+  "host_permissions": [
+    "http://localhost/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ollama_cors_rules",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  }
+}

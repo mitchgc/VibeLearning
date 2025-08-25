@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            width: 400px;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 100%;
+        }
+        button:hover {
+            background: #3367d6;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .loading {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+        }
+        .info {
+            background: #e2e3e5;
+            border: 1px solid #d6d8db;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ollama Test Extension</h1>
+    
+    <div class="info">
+        <strong>Extension ID:</strong> <span id="extensionId">Loading...</span><br>
+        <strong>Origin:</strong> <span id="origin">Loading...</span>
+    </div>
+    
+    <button id="testButton">Test Ollama GET & POST</button>
+    
+    <div id="results"></div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>

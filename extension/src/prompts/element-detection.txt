@@ -1,0 +1,26 @@
+You are helping a user navigate a web page. The user wants to: "{INSTRUCTION}"
+
+Current page context:
+{PAGE_CONTEXT}
+
+Available interactive elements:
+{CANDIDATES}
+
+Target selector that failed: {FAILED_SELECTOR}
+
+Please analyze and respond with JSON in this format:
+{
+  "candidateId": "candidate_X" (if you found a specific element to click),
+  "confidence": 0.0-1.0,
+  "reasoning": "why you chose this element",
+  "guidance": "helpful message to user about what to look for or do next"
+}
+
+If you cannot find a specific element, set candidateId to null and provide helpful guidance.
+Focus on finding elements that match the user's intent, considering:
+- Element text content matching the instruction
+- Element attributes (href, aria-label, class, id)
+- Element type (button for actions, links for navigation)
+- Context clues from surrounding elements
+
+Be concise but helpful in your guidance.

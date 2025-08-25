@@ -1,16 +1,20 @@
 {
   "../../../../../../@crx/manifest": {
-    "file": "assets/crx-manifest.js-Bu42g3RM.js",
+    "file": "assets/crx-manifest.js-BOq6QlC5.js",
     "name": "crx-manifest.js",
     "src": "../../../../../../@crx/manifest",
     "isEntry": true
+  },
+  "_content-main.ts-loader-DZ1F6kxv.js": {
+    "file": "assets/content-main.ts-loader-DZ1F6kxv.js",
+    "src": "_content-main.ts-loader-DZ1F6kxv.js"
   },
   "_modulepreload-polyfill-B5Qt9EMX.js": {
     "file": "assets/modulepreload-polyfill-B5Qt9EMX.js",
     "name": "modulepreload-polyfill"
   },
   "popup.html": {
-    "file": "assets/popup-C38Wj-wp.js",
+    "file": "assets/popup-Boqc26B2.js",
     "name": "popup",
     "src": "popup.html",
     "isEntry": true,
@@ -22,24 +26,50 @@
     ]
   },
   "sidepanel.html": {
-    "file": "assets/sidepanel.html-UUXXQ_M9.js",
+    "file": "assets/sidepanel.html-eg5vXBLE.js",
     "name": "sidepanel.html",
     "src": "sidepanel.html",
     "isEntry": true,
     "imports": [
       "_modulepreload-polyfill-B5Qt9EMX.js"
+    ],
+    "css": [
+      "assets/sidepanel-B9vqORwJ.css"
     ]
   },
-  "src/background.ts": {
-    "file": "assets/background.ts-CZxwo607.js",
-    "name": "background.ts",
-    "src": "src/background.ts",
+  "src/background/index.ts": {
+    "file": "assets/index.ts-mkSyEygs.js",
+    "name": "index.ts",
+    "src": "src/background/index.ts",
     "isEntry": true
   },
-  "src/content-interactive.ts": {
-    "file": "assets/content-interactive.ts-rtrK1uAQ.js",
-    "name": "content-interactive.ts",
-    "src": "src/content-interactive.ts",
-    "isEntry": true
+  "src/content-main.ts": {
+    "file": "assets/content-main.ts-DCWbqaSK.js",
+    "name": "content-main.ts",
+    "src": "src/content-main.ts",
+    "isEntry": true,
+    "dynamicImports": [
+      "src/content-script/modules/UIController.ts",
+      "src/content-script/modules/WorkflowEngine.ts",
+      "src/content-script/modules/SmartDetection.ts"
+    ]
+  },
+  "src/content-script/modules/SmartDetection.ts": {
+    "file": "assets/SmartDetection-Dlfqwm68.js",
+    "name": "SmartDetection",
+    "src": "src/content-script/modules/SmartDetection.ts",
+    "isDynamicEntry": true
+  },
+  "src/content-script/modules/UIController.ts": {
+    "file": "assets/UIController-Q2zxE7fO.js",
+    "name": "UIController",
+    "src": "src/content-script/modules/UIController.ts",
+    "isDynamicEntry": true
+  },
+  "src/content-script/modules/WorkflowEngine.ts": {
+    "file": "assets/WorkflowEngine-D1tEMk2v.js",
+    "name": "WorkflowEngine",
+    "src": "src/content-script/modules/WorkflowEngine.ts",
+    "isDynamicEntry": true
   }
 }

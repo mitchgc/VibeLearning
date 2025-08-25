@@ -106,6 +106,26 @@ class SidePanelController {
         sendResponse({ success: true });
         break;
         
+      case 'SMART_DETECT_PROGRESS':
+        this.handleSmartDetectProgress(request.phase, request.message);
+        sendResponse({ success: true });
+        break;
+        
+      case 'SMART_DETECT_SUCCESS':
+        this.handleSmartDetectSuccess(request.message, request.elementInfo);
+        sendResponse({ success: true });
+        break;
+        
+      case 'SMART_DETECT_FAILURE':
+        this.handleSmartDetectFailure(request.message);
+        sendResponse({ success: true });
+        break;
+        
+      case 'SMART_DETECT_GUIDANCE':
+        this.handleSmartDetectGuidance(request.guidance);
+        sendResponse({ success: true });
+        break;
+        
       default:
         sendResponse({ error: 'Unknown message type' });
     }
@@ -347,8 +367,11 @@ class SidePanelController {
       }
     }
 
+    // Show loading state while trying to find element
+    this.showElementSearching(step);
+    
     // Try to highlight element on the page
-    this.highlightElement(step);
+    this.highlightElementWithFeedback(step);
     
     // Update storage
     chrome.storage.local.set({
@@ -359,28 +382,106 @@ class SidePanelController {
     });
   }
 
-  async highlightElement(step: WorkflowStep) {
+  showElementSearching(step: WorkflowStep) {
+    const elementWarning = document.getElementById('element-warning');
+    if (elementWarning) {
+      elementWarning.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="loading-spinner" style="
+            width: 16px; height: 16px; border: 2px solid #e0e0e0; 
+            border-top: 2px solid #4CAF50; border-radius: 50%; 
+            animation: spin 1s linear infinite;
+          "></div>
+          <span>🔍 Searching for element...</span>
+        </div>
+        <div style="margin-top: 8px; font-size: 12px; color: #666;">
+          Looking for: <code>${step.selector}</code>
+        </div>
+      `;
+      elementWarning.style.display = 'block';
+    }
+  }
+
+  async highlightElementWithFeedback(step: WorkflowStep) {
     if (!this.currentTab) return;
     
     try {
       // Send message to content script to highlight element
-      await chrome.tabs.sendMessage(this.currentTab.id, {
+      const response = await chrome.tabs.sendMessage(this.currentTab.id, {
         type: 'HIGHLIGHT_ELEMENT',
         selector: step.selector,
         step: step
       });
       
-      // Hide element warning
-      const elementWarning = document.getElementById('element-warning');
-      if (elementWarning) elementWarning.style.display = 'none';
+      console.log('Highlight element response:', response);
+      
+      // Check if element was actually found
+      if (response && response.elementFound) {
+        // Element found successfully - hide the warning after showing success briefly
+        setTimeout(() => {
+          const elementWarning = document.getElementById('element-warning');
+          if (elementWarning) {
+            elementWarning.innerHTML = `
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: #4CAF50;">✅ Element found and highlighted!</span>
+              </div>
+            `;
+            elementWarning.style.backgroundColor = '#e8f5e9';
+            elementWarning.style.color = '#2e7d32';
+          }
+        }, 800);
+        
+        // Hide completely after 2 seconds
+        setTimeout(() => {
+          const elementWarning = document.getElementById('element-warning');
+          if (elementWarning) elementWarning.style.display = 'none';
+        }, 2500);
+        
+      } else {
+        // Element not found - show smart detection option
+        this.showElementNotFoundState(step);
+      }
       
     } catch (error) {
-      console.log('Could not highlight element:', error);
-      
-      // Show element warning
-      const elementWarning = document.getElementById('element-warning');
-      if (elementWarning) elementWarning.style.display = 'block';
+      console.log('Could not communicate with content script:', error);
+      // Communication failed - also show smart detection option
+      this.showElementNotFoundState(step);
     }
+  }
+
+  showElementNotFoundState(step: WorkflowStep) {
+    // Show element not found state after the search period
+    setTimeout(() => {
+      const elementWarning = document.getElementById('element-warning');
+      if (elementWarning) {
+        elementWarning.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span>⚠️ Element not found automatically</span>
+          </div>
+          <div style="margin-top: 8px; font-size: 12px; color: #666;">
+            Target: <code>${step.selector}</code>
+          </div>
+          <div style="margin-top: 12px;">
+            <button id="smart-detect-btn" class="smart-detect-btn" style="
+              background: #2196F3; color: white; padding: 8px 12px; 
+              border-radius: 4px; border: none; font-size: 12px; cursor: pointer;
+              transition: all 0.2s;
+            ">
+              🧠 Try Smart Detection
+            </button>
+          </div>
+        `;
+        elementWarning.style.backgroundColor = '#fef3c7';
+        elementWarning.style.color = '#92400e';
+        elementWarning.style.display = 'block';
+        
+        // Add click listener for smart detection
+        const smartDetectBtn = document.getElementById('smart-detect-btn');
+        if (smartDetectBtn) {
+          smartDetectBtn.addEventListener('click', () => this.smartDetectionWithFeedback());
+        }
+      }
+    }, 1200); // Show the "not found" state after 1.2 seconds
   }
 
   nextStep() {
@@ -402,22 +503,214 @@ class SidePanelController {
   }
 
   async smartDetection() {
+    // Legacy method - redirect to new method
+    return this.smartDetectionWithFeedback();
+  }
+
+  async smartDetectionWithFeedback() {
     if (!this.currentWorkflow || !this.currentTab) return;
     
     const step = this.currentWorkflow.steps[this.currentStep];
+    const elementWarning = document.getElementById('element-warning');
+    
+    // Phase 1: Show initial analysis
+    if (elementWarning) {
+      elementWarning.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="loading-spinner" style="
+            width: 16px; height: 16px; border: 2px solid #e0e0e0; 
+            border-top: 2px solid #2196F3; border-radius: 50%; 
+            animation: spin 1s linear infinite;
+          "></div>
+          <span>🧠 Analyzing page structure...</span>
+        </div>
+        <div style="margin-top: 8px; font-size: 12px; color: #666;">
+          Phase 1: DOM Analysis
+        </div>
+      `;
+      elementWarning.style.display = 'block';
+    }
+    
+    // Phase 2: Accessibility tree analysis (after 1 second)
+    setTimeout(() => {
+      if (elementWarning) {
+        elementWarning.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="loading-spinner" style="
+              width: 16px; height: 16px; border: 2px solid #e0e0e0; 
+              border-top: 2px solid #2196F3; border-radius: 50%; 
+              animation: spin 1s linear infinite;
+            "></div>
+            <span>🔍 Checking accessibility labels...</span>
+          </div>
+          <div style="margin-top: 8px; font-size: 12px; color: #666;">
+            Phase 2: Accessibility Analysis
+          </div>
+        `;
+      }
+    }, 1000);
+    
+    // Phase 3: Text content matching (after 2 seconds)
+    setTimeout(() => {
+      if (elementWarning) {
+        elementWarning.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="loading-spinner" style="
+              width: 16px; height: 16px; border: 2px solid #e0e0e0; 
+              border-top: 2px solid #2196F3; border-radius: 50%; 
+              animation: spin 1s linear infinite;
+            "></div>
+            <span>📝 Matching text content...</span>
+          </div>
+          <div style="margin-top: 8px; font-size: 12px; color: #666;">
+            Phase 3: Text Content Analysis
+          </div>
+        `;
+      }
+    }, 2000);
     
     try {
-      // Try smart detection by sending message to content script
-      await chrome.tabs.sendMessage(this.currentTab.id, {
-        type: 'SMART_DETECT',
-        selector: step.selector,
-        step: step
-      });
-      
-      console.log('Smart detection attempted for:', step.selector);
+      // Send the actual smart detection message after showing the phases
+      setTimeout(async () => {
+        try {
+          // First ensure content script is loaded
+          await this.ensureContentScript();
+          
+          const response = await chrome.tabs.sendMessage(this.currentTab.id, {
+            type: 'SMART_DETECT',
+            selector: step.selector,
+            step: step
+          });
+          
+          console.log('Smart detection attempted for:', step.selector);
+          
+          // The content script will handle the UI updates through its own feedback system
+          
+        } catch (error) {
+          console.log('Smart detection failed:', error);
+          
+          // Show failure state with better error message
+          if (elementWarning) {
+            const errorMessage = this.getSmartDetectionErrorMessage(error);
+            elementWarning.innerHTML = `
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span>❌ Smart detection failed</span>
+              </div>
+              <div style="margin-top: 8px; font-size: 12px; color: #666;">
+                ${errorMessage}
+              </div>
+              <div style="margin-top: 12px;">
+                <button onclick="location.reload()" style="
+                  background: #f44336; color: white; padding: 8px 12px; 
+                  border-radius: 4px; border: none; font-size: 12px; cursor: pointer;
+                ">
+                  Reload Page
+                </button>
+              </div>
+            `;
+          }
+        }
+      }, 3000);
       
     } catch (error) {
-      console.log('Smart detection failed:', error);
+      console.log('Smart detection setup failed:', error);
+    }
+  }
+
+  handleSmartDetectProgress(phase: string, message: string) {
+    const elementWarning = document.getElementById('element-warning');
+    if (elementWarning) {
+      elementWarning.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="loading-spinner" style="
+            width: 16px; height: 16px; border: 2px solid #e0e0e0; 
+            border-top: 2px solid #2196F3; border-radius: 50%; 
+            animation: spin 1s linear infinite;
+          "></div>
+          <span>${message}</span>
+        </div>
+        <div style="margin-top: 8px; font-size: 12px; color: #666;">
+          ${phase}
+        </div>
+      `;
+      elementWarning.style.display = 'block';
+    }
+  }
+
+  handleSmartDetectSuccess(message: string, elementInfo: any) {
+    const elementWarning = document.getElementById('element-warning');
+    if (elementWarning) {
+      elementWarning.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 16px;">✅</span>
+          <span style="color: #4CAF50; font-weight: 500;">${message}</span>
+        </div>
+        <div style="margin-top: 8px; font-size: 12px; color: #666;">
+          Found: <code>${elementInfo.tagName}</code> ${elementInfo.className ? `class="${elementInfo.className}"` : ''}
+        </div>
+        <div style="margin-top: 8px; font-size: 11px; color: #999; font-style: italic;">
+          "${elementInfo.textContent}..."
+        </div>
+      `;
+      elementWarning.style.backgroundColor = '#e8f5e9';
+      elementWarning.style.color = '#2e7d32';
+      elementWarning.style.display = 'block';
+      
+      // Hide after 3 seconds
+      setTimeout(() => {
+        if (elementWarning) elementWarning.style.display = 'none';
+      }, 3000);
+    }
+  }
+
+  handleSmartDetectFailure(message: string) {
+    const elementWarning = document.getElementById('element-warning');
+    if (elementWarning) {
+      elementWarning.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>${message}</span>
+        </div>
+        <div style="margin-top: 8px; font-size: 12px; color: #666;">
+          Try looking manually or check if you're on the correct page
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="this.closest('#element-warning').style.display='none'" style="
+            background: #666; color: white; padding: 6px 10px; 
+            border-radius: 4px; border: none; font-size: 11px; cursor: pointer;
+          ">
+            Dismiss
+          </button>
+        </div>
+      `;
+      elementWarning.style.backgroundColor = '#ffebee';
+      elementWarning.style.color = '#c62828';
+      elementWarning.style.display = 'block';
+    }
+  }
+
+  handleSmartDetectGuidance(guidance: string) {
+    const elementWarning = document.getElementById('element-warning');
+    if (elementWarning) {
+      elementWarning.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span style="font-size: 16px;">🤖</span>
+          <span style="color: #2196F3; font-weight: 500;">AI Guidance</span>
+        </div>
+        <div style="margin-bottom: 12px; line-height: 1.4; font-size: 13px;">
+          ${guidance}
+        </div>
+        <div style="margin-top: 12px;">
+          <button onclick="this.closest('#element-warning').style.display='none'" style="
+            background: #2196F3; color: white; padding: 6px 10px; 
+            border-radius: 4px; border: none; font-size: 11px; cursor: pointer;
+          ">
+            Got it
+          </button>
+        </div>
+      `;
+      elementWarning.style.backgroundColor = '#e3f2fd';
+      elementWarning.style.color = '#1565c0';
+      elementWarning.style.display = 'block';
     }
   }
 
@@ -481,6 +774,50 @@ class SidePanelController {
     setTimeout(() => {
       this.closeWorkflow();
     }, 5000);
+  }
+
+  async ensureContentScript() {
+    try {
+      // Try to ping the content script
+      await chrome.tabs.sendMessage(this.currentTab.id, { type: 'PING' });
+      console.log('Content script is loaded and ready');
+    } catch (error) {
+      console.log('Content script not responding, attempting injection...');
+      
+      try {
+        // Inject content script
+        await chrome.scripting.executeScript({
+          target: { tabId: this.currentTab.id },
+          files: ['assets/content-main.ts-DvhctQT1.js']
+        });
+        
+        // Wait for initialization
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Verify it's working
+        await chrome.tabs.sendMessage(this.currentTab.id, { type: 'PING' });
+        console.log('Content script injected successfully');
+        
+      } catch (injectionError) {
+        throw new Error(`Content script injection failed: ${injectionError.message}`);
+      }
+    }
+  }
+
+  getSmartDetectionErrorMessage(error: any): string {
+    const message = error?.message || error || 'Unknown error';
+    
+    if (message.includes('Receiving end does not exist')) {
+      return 'Could not connect to page. The page may need to be refreshed.';
+    } else if (message.includes('Cannot access')) {
+      return 'Cannot access this page. Check if the extension has permission.';
+    } else if (message.includes('injection failed')) {
+      return 'Failed to load detection system. Try refreshing the page.';
+    } else if (message.includes('Unsupported website')) {
+      return 'This website is not currently supported for smart detection.';
+    } else {
+      return 'Detection system encountered an error. Try refreshing the page.';
+    }
   }
 }
 

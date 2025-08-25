@@ -7,16 +7,17 @@
     "activeTab",
     "storage",
     "scripting",
-    "sidePanel"
-  ],
-  "optional_permissions": [
-    "tabs"
+    "sidePanel",
+    "tabs",
+    "declarativeNetRequest"
   ],
   "host_permissions": [
     "https://*.workday.com/*",
     "https://*.youtube.com/*",
     "https://*.github.com/*",
-    "https://mail.google.com/*"
+    "https://mail.google.com/*",
+    "http://localhost/*",
+    "http://localhost:11434/*"
   ],
   "optional_host_permissions": [
     "https://*.salesforce.com/*",
@@ -26,7 +27,7 @@
     "https://*.netsuite.com/*"
   ],
   "background": {
-    "service_worker": "src/background.ts",
+    "service_worker": "src/background/index.ts",
     "type": "module"
   },
   "content_scripts": [
@@ -37,8 +38,7 @@
         "https://*.github.com/*",
         "https://mail.google.com/*"
       ],
-      "js": ["src/content-interactive.ts"],
-      "css": ["src/styles/overlay.css"],
+      "js": ["src/content-main.ts"],
       "run_at": "document_idle"
     }
   ],
@@ -61,8 +61,20 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["src/styles/shepherd-theme.css"],
+      "resources": [
+        "src/styles/shepherd-theme.css",
+        "src/prompts/element-detection.txt"
+      ],
       "matches": ["<all_urls>"]
     }
-  ]
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ollama_cors_rules",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  }
 }

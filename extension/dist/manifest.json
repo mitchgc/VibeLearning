@@ -7,16 +7,17 @@
     "activeTab",
     "storage",
     "scripting",
-    "sidePanel"
-  ],
-  "optional_permissions": [
-    "tabs"
+    "sidePanel",
+    "tabs",
+    "declarativeNetRequest"
   ],
   "host_permissions": [
     "https://*.workday.com/*",
     "https://*.youtube.com/*",
     "https://*.github.com/*",
-    "https://mail.google.com/*"
+    "https://mail.google.com/*",
+    "http://localhost/*",
+    "http://localhost:11434/*"
   ],
   "optional_host_permissions": [
     "https://*.salesforce.com/*",
@@ -32,16 +33,13 @@
   "content_scripts": [
     {
       "js": [
-        "assets/content-interactive.ts-rtrK1uAQ.js"
+        "assets/content-main.ts-loader-DZ1F6kxv.js"
       ],
       "matches": [
         "https://*.workday.com/*",
         "https://*.youtube.com/*",
         "https://*.github.com/*",
         "https://mail.google.com/*"
-      ],
-      "css": [
-        "src/styles/overlay.css"
       ],
       "run_at": "document_idle"
     }
@@ -69,7 +67,8 @@
         "<all_urls>"
       ],
       "resources": [
-        "src/styles/shepherd-theme.css"
+        "src/styles/shepherd-theme.css",
+        "src/prompts/element-detection.txt"
       ],
       "use_dynamic_url": false
     },
@@ -81,9 +80,21 @@
         "https://mail.google.com/*"
       ],
       "resources": [
-        "assets/content-interactive.ts-rtrK1uAQ.js"
+        "assets/UIController-Q2zxE7fO.js",
+        "assets/WorkflowEngine-D1tEMk2v.js",
+        "assets/SmartDetection-Dlfqwm68.js",
+        "assets/content-main.ts-DCWbqaSK.js"
       ],
       "use_dynamic_url": false
     }
-  ]
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ollama_cors_rules",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  }
 }

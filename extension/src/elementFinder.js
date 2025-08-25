@@ -331,7 +331,7 @@ class CachedPatternStrategy {
 
   async getStoredPatterns(intent) {
     try {
-      const stored = await browser.storage.local.get('patterns');
+      const stored = await chrome.storage.local.get('patterns');
       const patterns = stored.patterns || [];
       
       return patterns

@@ -30,4 +30,15 @@ if (fs.existsSync('src/styles/shepherd-theme.css')) {
   console.log('✅ Copied shepherd-theme.css');
 }
 
+// Copy prompts directory
+const promptsDir = 'dist/src/prompts';
+if (!fs.existsSync(promptsDir)) {
+  fs.mkdirSync(promptsDir, { recursive: true });
+}
+
+if (fs.existsSync('src/prompts/element-detection.txt')) {
+  fs.copyFileSync('src/prompts/element-detection.txt', 'dist/src/prompts/element-detection.txt');
+  console.log('✅ Copied element-detection.txt');
+}
+
 console.log('✨ Build complete! Load dist/ folder in Chrome.');
